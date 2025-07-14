@@ -1,0 +1,3336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brave Beginnings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        box-sizing: border-box;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: inherit;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        overflow: hidden;
+      }
+      .page-container {
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        width: 550px;
+        margin: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .page-container.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .home-container,
+      .profile-container,
+      .maze-customization-container,
+      .maze-game-container,
+      .maze-congratulations-container,
+      .kindness-detective-container {
+        max-width: 85%;
+        width: 95%;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+        padding-bottom: 4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .bubble-pop-game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px;
+        margin-top: 400px;
+        box-sizing: border-box;
+        width: 1000px;
+        height: 600px;
+      }
+
+      .teambuilder-quest-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 50px;
+        margin-top: 0px;
+        box-sizing: border-box;
+        width: 1000px;
+        height: 600px;
+      }
+
+      .pixel-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        width: 300px;
+        height: 300px;
+        border: 1px solid #ccc;
+        margin: 2rem auto;
+        background-color: #f8f8f8;
+      }
+      .pixel {
+        width: 100%;
+        height: 100%;
+        border: 0.5px solid #eee;
+        background-color: #ffffff;
+        cursor: pointer;
+      }
+      .color-palette {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .color-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color 0.2s ease-in-out;
+      }
+      .color-box.selected {
+        border-color: #3b82f6;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+      .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close-button:hover,
+      .close-button:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .bottom-toolbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-around;
+        padding: 1rem 0;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+        z-index: 999;
+      }
+      .toolbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        color: #6b7280;
+        transition: color 0.2s ease-in-out;
+      }
+      .toolbar-item.active {
+        color: #3b82f6;
+      }
+      .toolbar-item svg {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 0.25rem;
+      }
+      .quest-card,
+      .minigame-card {
+        background-color: #e2e8f0;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin: 0.75rem;
+        width: calc(50% - 1.5rem);
+        max-width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+      }
+      .quest-card:hover,
+      .minigame-card:hover {
+        transform: translateY(-5px);
+      }
+      .quest-card img,
+      .minigame-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: contain;
+        border-radius: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .quest-card h3,
+      .minigame-card h3 {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #374151;
+        text-align: center;
+      }
+      .quests-grid,
+      .minigames-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin-top: 1.5rem;
+      }
+      .profile-avatar-display {
+        width: 250px;
+        height: 250px;
+        margin: 2rem auto;
+        border: 2px solid #ccc;
+        background-color: #f8f8f8;
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+      }
+      .profile-pixel {
+        width: 100%;
+        height: 100%;
+        border: 0.5px solid #eee;
+      }
+      .badges-section {
+        background-color: #e0f2fe;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        margin-top: 2rem;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+      .badges-section h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0c4a6e;
+        margin-bottom: 1rem;
+      }
+      .badges-section p {
+        color: #0c4a6e;
+        font-size: 1.125rem;
+      }
+      .badges-section svg {
+        width: 40px;
+        height: 40px;
+        color: #fbbf24;
+        margin-bottom: 0.75rem;
+      }
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding-left: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+      }
+      .section-header img {
+        height: 50px;
+        margin-right: 1rem;
+      }
+      .section-header h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #374151;
+        text-align: left;
+      }
+
+      .maze-grid-container {
+        display: grid;
+        border: 2px solid #333;
+        margin: 20px auto;
+        position: relative;
+      }
+      .maze-cell {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+      }
+      .maze-player {
+        position: absolute;
+        font-size: 2rem;
+        transition: left 0.1s linear, top 0.1s linear;
+        z-index: 10;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .maze-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 1rem;
+      }
+      .maze-controls .arrow-row {
+        display: flex;
+        gap: 1rem;
+      }
+      .maze-controls .arrow-button {
+        background-color: #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.1s ease-in-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 60px;
+        height: 60px;
+      }
+      .maze-controls .arrow-button:active {
+        transform: scale(0.95);
+      }
+
+      .question-modal,
+      .game-result-modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        justify-content: center;
+        align-items: center;
+      }
+      .question-modal-content,
+      .game-result-modal-content {
+        background-color: #fefefe;
+        padding: 30px;
+        border-radius: 1rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+        position: relative;
+      }
+      .question-modal-content h3,
+      .game-result-modal-content h3 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        color: #374151;
+      }
+      .question-modal-content input {
+        width: calc(100% - 2rem);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        font-size: 1.125rem;
+      }
+      .question-modal-content .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .question-modal-content .option-button {
+        background-color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        font-size: 1.125rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .question-modal-content .option-button:hover {
+        background-color: #cbd5e1;
+      }
+      .question-modal-content button,
+      .game-result-modal-content button {
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 1.125rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .question-modal-content button:hover,
+      .game-result-modal-content button:hover {
+        background-color: #2563eb;
+      }
+      .question-error {
+        color: red;
+        margin-top: 0.5rem;
+      }
+
+      .bubble-pop-game-container {
+        background-color: #e0f2fe;
+        position: relative;
+        overflow: hidden;
+        padding-top: 6rem;
+        justify-content: flex-start;
+      }
+      .bubble-pop-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+      }
+      .bubble-pop-header div {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #374151;
+      }
+      .bubble-area {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 1rem;
+      }
+      .bubble {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.1s ease-out;
+        animation: float 10s infinite linear;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        padding: 5px;
+        box-sizing: border-box;
+        word-break: break-word;
+      }
+      .bubble:active {
+        transform: scale(0.9);
+      }
+      .bubble.positive {
+        background-color: #4caf50;
+      }
+      .bubble.negative {
+        background-color: #ef4444;
+      }
+      .bubble.positive.blue {
+        background-color: #3b82f6;
+      }
+      .bubble.positive.yellow {
+        background-color: #eab308;
+      }
+      .bubble.positive.purple {
+        background-color: #a855f7;
+      }
+      .bubble.positive.orange {
+        background-color: #f97316;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh);
+        }
+        100% {
+          transform: translateY(-100px);
+        }
+      }
+
+      .creature-creator-container {
+        background-color: #f8fafc;
+        margin-top: 400px;
+        width: 4500px;
+        height: 600px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .creator-toolbar {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        padding: 1rem;
+        background-color: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .creator-toolbar button,
+      .creator-toolbar input[type="color"] {
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .creator-toolbar button {
+        background-color: #60a5fa;
+        color: white;
+        border: none;
+      }
+      .creator-toolbar button:hover {
+        background-color: #3b82f6;
+      }
+      .creator-toolbar input[type="color"] {
+        width: 50px;
+        height: 40px;
+        border: 1px solid #ccc;
+        padding: 0;
+      }
+      .background-options {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+      .background-option {
+        width: 30px;
+        height: 30px;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        border: 2px solid transparent;
+      }
+      .background-option.selected {
+        border-color: #3b82f6;
+      }
+      .creation-area {
+        width: 100%;
+        height: 500px;
+        border: 2px solid #ccc;
+        border-radius: 1rem;
+        margin-top: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        background-color: #f0f2f5;
+      }
+      .draggable-emoji,
+      .draggable-text {
+        position: absolute;
+        cursor: grab;
+        user-select: none;
+        font-size: 3rem;
+        z-index: 10;
+      }
+      .draggable-text {
+        font-size: 2rem;
+        color: #333;
+        padding: 5px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 5px;
+      }
+      .emoji-palette {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        padding: 1rem;
+        background-color: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .emoji-item {
+        font-size: 2.5rem;
+        cursor: grab;
+        transition: transform 0.1s ease-in-out;
+      }
+      .emoji-item:hover {
+        transform: scale(1.1);
+      }
+
+      .kindness-detective-container {
+        background: linear-gradient(135deg, #fce4ec, #e0f7fa);
+        padding-top: 4rem;
+      }
+      .kindness-header {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 1rem;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+      }
+      .kindness-header .back-button {
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .kindness-header .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+      .kindness-list {
+        width: 90%;
+        max-width: 600px;
+        margin-top: 2rem;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .kindness-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        background-color: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: background-color 0.2s ease-in-out;
+      }
+      .kindness-item.completed {
+        background-color: #e6ffe6;
+        text-decoration: line-through;
+        color: #6b7280;
+      }
+      .kindness-item-text {
+        font-size: 1.125rem;
+        color: #374151;
+        flex-grow: 1;
+        text-align: left;
+      }
+      .kindness-checkbox {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #3b82f6;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.2s ease-in-out,
+          border-color 0.2s ease-in-out;
+      }
+      .kindness-checkbox.checked {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+      }
+      .kindness-checkbox.checked svg {
+        color: white;
+      }
+      .kindness-congratulations {
+        background-color: #dcfce7;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        margin-top: 2rem;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .kindness-congratulations h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #16a34a;
+        margin-bottom: 1rem;
+      }
+      .kindness-congratulations p {
+        font-size: 1.25rem;
+        color: #16a34a;
+        margin-bottom: 1.5rem;
+      }
+
+      .teambuilder-quest-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        text-align: center;
+        min-height: calc(100vh - 80px - 4rem);
+        justify-content: center;
+      }
+      .teambuilder-quest-content h2 {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #1e3a8a;
+        margin-bottom: 1.5rem;
+      }
+      .teambuilder-quest-content p {
+        font-size: 1.25rem;
+        color: #374151;
+        margin-bottom: 2rem;
+        max-width: 700px;
+      }
+      .teambuilder-quest-content img {
+        max-width: 80%;
+        height: auto;
+        border-radius: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+      .teambuilder-quest-buttons {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .teambuilder-quest-buttons button {
+        background-color: #3b82f6;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out,
+          transform 0.2s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .teambuilder-quest-buttons button:hover {
+        background-color: #2563eb;
+        transform: translateY(-2px);
+      }
+      .superpower-option {
+        background-color: #e0f2fe;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.2s ease-in-out,
+          background-color 0.2s ease-in-out;
+      }
+      .superpower-option:hover {
+        border-color: #3b82f6;
+        background-color: #d0effc;
+      }
+      .superpower-option.selected {
+        border-color: #3b82f6;
+        background-color: #c0e7fb;
+        box-shadow: 0 0 0 3px #93c5fd;
+      }
+      .superpower-option h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e3a8a;
+        margin-bottom: 0.5rem;
+      }
+      .superpower-option p {
+        font-size: 1rem;
+        color: #4b5563;
+      }
+      .teambuilder-quest-back-button {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 10;
+      }
+      .teambuilder-quest-back-button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      .teambuilder-quest-dialog-box {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1rem auto;
+        max-width: 90%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        font-size: 1.25rem;
+        color: #374151;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .teambuilder-quest-dialog-box img {
+        max-width: 150px;
+        height: 600px;
+        margin-bottom: 1rem;
+      }
+
+      .teambuilder-quest-dialog-box button {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-top: 0.75rem;
+        color: white;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .teambuilder-quest-dialog-box button.red-button {
+        background-color: #ef4444;
+      }
+      .teambuilder-quest-dialog-box button.red-button:hover {
+        background-color: #dc2626;
+      }
+      .teambuilder-quest-dialog-box button.green-button {
+        background-color: #22c55e;
+      }
+      .teambuilder-quest-dialog-box button.green-button:hover {
+        background-color: #16a34a;
+      }
+      .teambuilder-quest-dialog-box button.blue-button {
+        background-color: #3b82f6;
+      }
+      .teambuilder-quest-dialog-box button.blue-button:hover {
+        background-color: #2563eb;
+      }
+
+      .game-over-screen,
+      .you-win-screen {
+        color: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        text-align: center;
+        z-index: 1002;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+      }
+      .game-over-screen.active,
+      .you-win-screen.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .game-over-screen h2,
+      .you-win-screen h2 {
+        font-size: 4rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+      }
+      .game-over-screen p,
+      .you-win-screen p {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        max-width: 600px;
+      }
+      .game-over-screen button,
+      .you-win-screen button {
+        background-color: white;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out,
+          transform 0.2s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+      .you-win-screen button {
+        color: white;
+      }
+      .game-over-screen button:hover,
+      .you-win-screen button:hover {
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div
+      id="start-page"
+      class="page-container active flex flex-col items-center"
+    >
+      <h1 class="text-5xl font-bold mb-8 text-gray-800">Welcome!</h1>
+      <input
+        type="text"
+        id="username-input"
+        placeholder="enter your name or username"
+        class="w-full p-4 mb-6 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition duration-200"
+      />
+      <button
+        id="get-started-button"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105"
+      >
+        Get started
+      </button>
+      <button
+        id="already-account-button"
+        class="mt-4 text-blue-500 hover:text-blue-700 text-md transition duration-200"
+      >
+        Already have an account? Click to login.
+      </button>
+    </div>
+
+    <!-- Already Have An Account Page (Login Page) -->
+    <div id="login-page" class="page-container login-container">
+      <h1 class="text-5xl font-bold mb-8 text-gray-800">Welcome back!</h1>
+      <input
+        type="text"
+        id="login-username-input"
+        placeholder="enter your name or username"
+        class="w-full p-4 mb-6 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition duration-200"
+      />
+      <button
+        id="go-to-homepage-login-button"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105"
+      >
+        Go to home page
+      </button>
+    </div>
+
+    <!-- Grade Selection Page -->
+    <div id="grade-page" class="page-container grade-container">
+      <h1 class="text-4xl font-bold mb-10 text-gray-800">
+        What grade are you in?
+      </h1>
+      <div class="space-y-6">
+        <button
+          class="grade-button w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-5 px-8 rounded-xl text-2xl shadow-md transition duration-200 transform hover:scale-105"
+          data-grade="elementary"
+        >
+          Elementary (1st-3rd)
+        </button>
+        <button
+          class="grade-button w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-5 px-8 rounded-xl text-2xl shadow-md transition duration-200 transform hover:scale-105"
+          data-grade="upper-elementary"
+        >
+          Upper Elementary (4th-5th)
+        </button>
+        <button
+          class="grade-button w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-5 px-8 rounded-xl text-2xl shadow-md transition duration-200 transform hover:scale-105"
+          data-grade="staff"
+        >
+          Staff & Volunteers
+        </button>
+      </div>
+    </div>
+
+    <!-- Staff Code Modal -->
+    <div id="staff-code-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">Enter Staff Code</h2>
+        <input
+          type="password"
+          id="staff-code-input"
+          placeholder="Enter code"
+          class="w-full p-4 mb-6 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition duration-200"
+        />
+        <button
+          id="submit-staff-code"
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105"
+        >
+          Submit
+        </button>
+        <p id="code-error-message" class="text-red-500 mt-4 hidden">
+          Incorrect code. Please try again.
+        </p>
+      </div>
+    </div>
+
+    <!-- Avatar Customization Page -->
+    <div id="avatar-page" class="page-container avatar-container">
+      <h1 class="text-4xl font-bold mb-8 text-gray-800">
+        Customize Your Avatar!
+      </h1>
+      <div class="pixel-grid" id="pixel-grid"></div>
+      <div class="color-palette" id="color-palette">
+        <div class="color-box bg-black selected" data-color="#000000"></div>
+        <div class="color-box bg-red-500" data-color="#ef4444"></div>
+        <div class="color-box bg-blue-500" data-color="#3b82f6"></div>
+        <div class="color-box bg-green-500" data-color="#22c55e"></div>
+        <div class="color-box bg-yellow-500" data-color="#eab308"></div>
+        <div class="color-box bg-purple-500" data-color="#a855f7"></div>
+        <div class="color-box bg-orange-500" data-color="#f97316"></div>
+        <div
+          class="color-box bg-white border border-gray-300"
+          data-color="#ffffff"
+        ></div>
+      </div>
+      <div class="flex justify-center gap-6 mt-8">
+        <button
+          id="clear-grid-button"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 inline-block mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+          Clear
+        </button>
+        <button
+          id="save-avatar-button"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 inline-block mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+            />
+          </svg>
+          Save
+        </button>
+      </div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page-container home-container">
+      <h1
+        class="text-5xl font-bold mb-6 text-gray-800"
+        style="font-family: 'Inter', sans-serif"
+      >
+        Home
+      </h1>
+      <div id="home-content" class="w-full">
+        <!-- Content will be dynamically loaded here based on grade -->
+      </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile-page" class="page-container profile-container">
+      <h1
+        class="text-5xl font-bold mb-6 text-gray-800"
+        style="font-family: 'Inter', sans-serif"
+      >
+        Profile
+      </h1>
+      <div id="profile-avatar-display" class="profile-avatar-display"></div>
+      <h2
+        id="profile-username"
+        class="text-3xl font-bold mt-4 text-gray-800"
+      ></h2>
+      <div class="badges-section text-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96-1.425L12 18.354 7.373 21.18c-1.007.617-2.231-.204-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <h2 class="text-center">Badges:</h2>
+        <p>Shiny achievements coming your way soon!</p>
+        <p>Coming Soon!</p>
+      </div>
+    </div>
+
+    <!-- Maze Customization Page -->
+    <div
+      id="maze-customization-page"
+      class="page-container maze-customization-container"
+    >
+      <h1 class="text-4xl font-bold mb-8 text-gray-800">
+        Customize Your Maze!
+      </h1>
+      <div class="mb-6 w-full max-w-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+          Choose your character:
+        </h2>
+        <div
+          id="character-selection"
+          class="flex justify-center gap-4 flex-wrap"
+        >
+          <span
+            class="character-emoji cursor-pointer text-5xl p-2 rounded-xl border-2 border-transparent hover:border-blue-500"
+            data-emoji="😀"
+            >😀</span
+          >
+          <span
+            class="character-emoji cursor-pointer text-5xl p-2 rounded-xl border-2 border-transparent hover:border-blue-500"
+            data-emoji="🐶"
+            >🐶</span
+          >
+          <span
+            class="character-emoji cursor-pointer text-5xl p-2 rounded-xl border-2 border-transparent hover:border-blue-500"
+            data-emoji="🚀"
+            >🚀</span
+          >
+          <span
+            class="character-emoji cursor-pointer text-5xl p-2 rounded-xl border-2 border-transparent hover:border-blue-500"
+            data-emoji="👻"
+            >👻</span
+          >
+          <span
+            class="character-emoji cursor-pointer text-5xl p-2 rounded-xl border-2 border-transparent hover:border-blue-500"
+            data-emoji="🍎"
+            >🍎</span
+          >
+        </div>
+      </div>
+      <div class="mb-8 w-full max-w-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+          Choose maze color scheme:
+        </h2>
+        <div
+          id="maze-color-selection"
+          class="flex justify-center gap-4 flex-wrap"
+        >
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #4caf50"
+            data-wall-color="#4CAF50"
+            data-path-color="#E8F5E9"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #ffc107"
+            data-wall-color="#FFC107"
+            data-path-color="#FFF8E1"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #2196f3"
+            data-wall-color="#2196F3"
+            data-path-color="#E3F2FD"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #9c27b0"
+            data-wall-color="#9C27B0"
+            data-path-color="#F3E5F5"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #795548"
+            data-wall-color="#795548"
+            data-path-color="#D7CCC8"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #607d8b"
+            data-wall-color="#607D8B"
+            data-path-color="#CFD8DC"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #e91e63"
+            data-wall-color="#E91E63"
+            data-path-color="#F8BBD0"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #000000"
+            data-wall-color="#000000"
+            data-path-color="#424242"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #a1887f"
+            data-wall-color="#A1887F"
+            data-path-color="#EFEBE9"
+          ></div>
+          <div
+            class="maze-color-option w-16 h-16 rounded-xl cursor-pointer border-2 border-transparent hover:border-blue-500"
+            style="background-color: #5c6bc0"
+            data-wall-color="#5C6BC0"
+            data-path-color="#E8EAF6"
+          ></div>
+        </div>
+      </div>
+      <button
+        id="start-maze-game-button"
+        class="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105"
+      >
+        Start Game
+      </button>
+    </div>
+
+    <!-- Maze Game Page -->
+    <div id="maze-game-page" class="page-container maze-game-container">
+      <h1 class="text-4xl font-bold mb-4 text-gray-800">
+        Maze Level <span id="current-maze-level">1</span>
+      </h1>
+      <div id="stars-display" class="text-2xl mb-4 text-yellow-500"></div>
+      <div id="maze-grid-wrapper" class="relative">
+        <div id="maze-grid" class="maze-grid-container"></div>
+        <div id="maze-player" class="maze-player"></div>
+      </div>
+      <div class="maze-controls">
+        <div class="arrow-row">
+          <button class="arrow-button" id="arrow-up">⬆️</button>
+        </div>
+        <div class="arrow-row">
+          <button class="arrow-button" id="arrow-left">⬅️</button>
+          <button class="arrow-button" id="arrow-down">⬇️</button>
+          <button class="arrow-button" id="arrow-right">➡️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div id="question-modal" class="question-modal">
+      <div class="question-modal-content">
+        <h3 id="question-text"></h3>
+        <div id="mc-options-container" class="options-grid hidden"></div>
+        <input type="text" id="answer-input" placeholder="Your answer" />
+        <p id="question-feedback" class="question-error hidden"></p>
+        <button id="submit-answer-button">Submit Answer</button>
+      </div>
+    </div>
+
+    <!-- Maze Congratulations Page -->
+    <div
+      id="maze-congratulations-page"
+      class="page-container maze-congratulations-container"
+    >
+      <h1 class="text-5xl font-bold mb-8 text-green-600">Congratulations!</h1>
+      <p class="text-2xl mb-10 text-gray-700">You completed the maze!</p>
+      <button
+        id="play-again-button"
+        class="w-full max-w-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105 mb-4"
+      >
+        Play Again
+      </button>
+      <button
+        id="back-to-home-button"
+        class="w-full max-w-xs bg-gray-500 hover:bg-gray-600 text-white font-semibold py-4 px-6 rounded-xl text-xl shadow-md transition duration-200 transform hover:scale-105"
+      >
+        Back to Home
+      </button>
+    </div>
+
+    <!-- Bubble Pop Game Page -->
+    <div
+      id="bubble-pop-game-page"
+      class="page-container bubble-pop-game-container"
+    >
+      <div class="bubble-pop-header">
+        <div id="bubble-score">Score: 0</div>
+        <div id="bubble-timer">Time: 60</div>
+      </div>
+      <div id="bubble-area" class="bubble-area"></div>
+    </div>
+
+    <!-- Bubble Pop Game Result Modal -->
+    <div id="bubble-result-modal" class="game-result-modal">
+      <div class="game-result-modal-content">
+        <h3 id="bubble-result-message"></h3>
+        <p class="text-xl mb-6">
+          Your final score:
+          <span id="final-bubble-score" class="font-bold"></span>
+        </p>
+        <button
+          id="bubble-play-again-button"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105 mb-4"
+        >
+          Play Again
+        </button>
+        <button
+          id="bubble-back-to-home-button"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105"
+        >
+          Back to Home
+        </button>
+      </div>
+    </div>
+
+    <!-- Creature Creator Page -->
+    <div
+      id="creature-creator-page"
+      class="page-container creature-creator-container"
+    >
+      <h1 class="text-4xl font-bold mb-4 text-gray-800">Creature Creator</h1>
+      <div class="creator-toolbar">
+        <button id="add-emoji-button" class="bg-green-500 hover:bg-green-600">
+          Add Emoji
+        </button>
+        <input
+          type="text"
+          id="text-input"
+          placeholder="Add text"
+          class="p-2 border rounded-md"
+        />
+        <button id="add-text-button" class="bg-purple-500 hover:bg-purple-600">
+          Add Text
+        </button>
+        <div class="background-options">
+          <div
+            class="background-option bg-red-500"
+            data-bg-color="#EF4444"
+          ></div>
+          <div
+            class="background-option bg-orange-500"
+            data-bg-color="#F97316"
+          ></div>
+          <div
+            class="background-option bg-yellow-500"
+            data-bg-color="#EAB308"
+          ></div>
+          <div
+            class="background-option"
+            style="
+              background: linear-gradient(
+                to right,
+                red,
+                orange,
+                yellow,
+                green,
+                blue,
+                indigo,
+                violet
+              );
+            "
+            data-bg-color="linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)"
+          ></div>
+          <div
+            class="background-option"
+            style="
+              background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+            "
+            data-bg-color="linear-gradient(to bottom right, #FF7E5F, #FEB47B)"
+          ></div>
+        </div>
+        <button id="save-scene-button" class="bg-blue-500 hover:bg-blue-600">
+          Save Scene
+        </button>
+
+        <button
+          id="creature-creator-back-home-button"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105 hidden"
+        >
+          Go Back Home
+        </button>
+      </div>
+      <div id="emoji-palette" class="emoji-palette hidden">
+        <span class="emoji-item" draggable="true">😀</span>
+        <span class="emoji-item" draggable="true">🐶</span>
+        <span class="emoji-item" draggable="true">🐱</span>
+        <span class="emoji-item" draggable="true">🐭</span>
+        <span class="emoji-item" draggable="true">🐹</span>
+        <span class="emoji-item" draggable="true">🐰</span>
+        <span class="emoji-item" draggable="true">🦊</span>
+        <span class="emoji-item" draggable="true">🐻</span>
+        <span class="emoji-item" draggable="true">🐼</span>
+        <span class="emoji-item" draggable="true">🐨</span>
+        <span class="emoji-item" draggable="true">🐯</span>
+        <span class="emoji-item" draggable="true">🦁</span>
+        <span class="emoji-item" draggable="true">🐮</span>
+        <span class="emoji-item" draggable="true">🐷</span>
+        <span class="emoji-item" draggable="true">🐸</span>
+        <span class="emoji-item" draggable="true">🐒</span>
+        <span class="emoji-item" draggable="true">🦅</span>
+        <span class="emoji-item" draggable="true">🦉</span>
+        <span class="emoji-item" draggable="true">🦋</span>
+        <span class="emoji-item" draggable="true">🐢</span>
+        <span class="emoji-item" draggable="true">🐍</span>
+        <span class="emoji-item" draggable="true">🦖</span>
+        <span class="emoji-item" draggable="true">🦕</span>
+        <span class="emoji-item" draggable="true">🐙</span>
+        <span class="emoji-item" draggable="true">🐠</span>
+        <span class="emoji-item" draggable="true">🐳</span>
+        <span class="emoji-item" draggable="true">🌎</span>
+        <span class="emoji-item" draggable="true">🌟</span>
+        <span class="emoji-item" draggable="true">🌈</span>
+        <span class="emoji-item" draggable="true">☀️</span>
+        <span class="emoji-item" draggable="true">☁️</span>
+        <span class="emoji-item" draggable="true">🏠</span>
+        <span class="emoji-item" draggable="true">🌳</span>
+        <span class="emoji-item" draggable="true">🌸</span>
+        <span class="emoji-item" draggable="true">🚗</span>
+        <span class="emoji-item" draggable="true">🚲</span>
+        <span class="emoji-item" draggable="true">🎈</span>
+        <span class="emoji-item" draggable="true">🎁</span>
+        <span class="emoji-item" draggable="true">🎉</span>
+        <span class="emoji-item" draggable="true">💖</span>
+      </div>
+      <div id="creation-area" class="creation-area"></div>
+    </div>
+
+    <!-- Kindness Detective Page -->
+    <div
+      id="kindness-detective-page"
+      class="page-container kindness-detective-container"
+    >
+      <div class="kindness-header">
+        <button id="kindness-back-to-home" class="back-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
+          Back to Home
+        </button>
+      </div>
+      <h1 class="text-4xl font-bold mb-8 text-gray-800">Kindness Detective</h1>
+      <p class="text-xl mb-6 text-gray-700">
+        Your mission: Find and spread kindness!
+      </p>
+      <div id="kindness-list" class="kindness-list">
+        <!-- Kindness tasks will be loaded here -->
+      </div>
+      <div
+        id="kindness-congratulations"
+        class="kindness-congratulations hidden"
+      >
+        <h2>You're a Kindness Champion!</h2>
+        <p>
+          Every act of kindness creates a ripple effect. Keep spreading joy and
+          making the world a brighter place!
+        </p>
+        <button
+          id="kindness-congratulations-home"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl text-lg shadow-md transition duration-200 transform hover:scale-105"
+        >
+          Back to Home
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="teambuilder-quest-page"
+      class="page-container teambuilder-quest-container"
+    >
+      <button
+        id="teambuilder-back-to-home"
+        class="teambuilder-quest-back-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+          />
+        </svg>
+        Back to Quests
+      </button>
+
+      <div id="teambuilder-step-1" class="teambuilder-quest-content">
+        <img
+          src="jungle.png"
+          alt="Camp-Scene"
+          style="width: 500px; height: 250px"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            You and your team are exploring the jungle when you get lost! Your
+            team has decided it is best to set up camp! What do you do first?
+          </p>
+          <button class="blue-button" data-action="collect-wood">
+            Collect Wood
+          </button>
+          <button class="blue-button" data-action="find-water">
+            Go find water with your team
+          </button>
+          <button class="blue-button" data-action="let-others-work">
+            Let everyone else do the work
+          </button>
+        </div>
+      </div>
+
+      <div id="teambuilder-game-over-lazy" class="game-over-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>GAME OVER 😔</h2>
+        <p>
+          You decided to let everyone else do all the hard work. While your team was busy collecting wood, finding water, and making plans, you just sat back and watched.
+          <br><br>
+          After a while, your team realized they couldn't count on you. They worked together, found their way out of the jungle, and left you behind. Being a part of a team means helping out and doing your part. Without everyone participating, a team can't be strong.
+          <br><br>
+          It's tough being alone in the jungle!
+        </p>
+        <button id="game-over-lazy-return-home" class="red-button">Return Home</button>
+        </div>
+      </div>
+
+      <div id="teambuilder-step-2" class="teambuilder-quest-content">
+        <img
+          src="https://placehold.co/600x300/A7F3D0/10B981?text=Clear+Stream+Found!"
+          alt="Clear Stream"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            Fantastic work, team! After a focused search, you've discovered a
+            river. This success is a testament to your effort and observation
+            skills. Each of you played a vital role in this discovery, proving
+            that when you work together, you can overcome any challenge.
+          </p>
+          <button class="blue-button" data-action="collect-wood">
+            Collect Wood
+          </button>
+          <button class="blue-button" data-action="share-water">
+            Share the water with the team
+        </div>
+      </div>
+
+      <div id="teambuilder-step-2-share" class="teambuilder-quest-content">
+        <img
+          src="https://placehold.co/600x300/A7F3D0/10B981?text=Share+Water!"
+          alt="Share Water"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            A wise choice! Sharing the water ensures everyone is hydrated and keeps your team together! This act of kindness builds trust and shows that you're all looking out for each other. A team that cares for each other is an unstoppable force!
+            How do you want to build on this strengthened bond?
+          </p>
+          <button class="blue-button" data-action="explore-cave">
+            Explore the nearby cave
+          </button>
+          <button class="blue-button" data-action="tell-a-story">
+            Tell a story to boost morale
+        </div>
+      </div>
+
+      <div id="teambuilder-step-2-story" class="teambuilder-quest-content">
+        <img
+          src="https://placehold.co/600x300/A7F3D0/10B981?text=Tell+a+Story!"
+          alt="Tell a Story"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            What a wonderful idea! You gather your team around, and someone starts a fun, silly story about a brave squirrel who helped all his friends find acorns. Everyone giggles and adds their own parts, making the story even better! Sharing stories makes everyone feel happy and connected. 
+            It reminds you that even when things are tough, laughter and friendship make everything easier. Your team's spirits are definitely lifted!
+          </p>
+          <button class="blue-button" data-action="collect-wood">
+            Collect wood
+          </button>
+          <button class="blue-button" data-action="continue-adventure">
+            Continue our adventure feeling refreshed!
+        </div>
+      </div>
+
+      <div id="teambuilder-step-2-finale" class="teambuilder-quest-content">
+        <img
+          src="https://placehold.co/600x300/A7F3D0/10B981?text=Clear+Stream+Found!"
+          alt="Finale"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            As you continue your adventure, you notice the trees getting smaller. The suns starts to get brighter, and soon, you step out of the jungle and onto a path!
+
+            You did it! Together, your team faced challenges, helped each other, and used your amazing skills to find your way out. Congratulations, brave adventurers! Your team builder quest is complete!
+          </p>
+        </div>
+      </div>
+
+      <div id="teambuilder-step-2-fire" class="teambuilder-quest-content">
+        <img
+          src="https://placehold.co/300x200/8B4513/FFFFFF?text=Logs+for+Fire"
+          alt="Logs for Fire"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            You and another team member collect wood for a fire. But you
+            remember... You have no idea how to start a fire.
+          </p>
+          <button class="blue-button" data-action="ask-team">
+            Ask your team
+          </button>
+          <button class="green-button" data-action="dont-say-anything">
+            Don't say anything
+          </button>
+        </div>
+      </div>
+
+      <div id="teambuilder-step-3-fire-success" class="teambuilder-quest-content">
+        <img src="https://placehold.co/600x300/FFD700/8B4513?text=Cozy+Campfire" alt="Cozy Campfire" onerror="this.onerror=null;this.src='https://placehold.co/600x300/FFD700/8B4513?text=Campfire';" />
+
+        <div class="teambuilder-quest-dialog-box">
+            <p>
+                That was super smart! You admit you're not sure how to start the fire. Immediately, a teammate says, "I know a trick!" and another adds, "I can help gather the right kind of leaves!"
+                <br><br>
+                Working together, sharing what each of you knows, a warm, fire lights up your camp! See? It's okay not to know everything, because your team has different strengths.
+            </p>
+            <button class="blue-button" data-action="cook-food">
+                Cook some food
+            </button>
+            <button class="blue-button" data-action="explore-cave">
+                Explore the near by cave
+            </button>
+        </div>
+    </div>
+
+    <div id="teambuilder-step-4-cook-food" class="teambuilder-quest-content">
+      <img src="https://placehold.co/600x300/FFC107/333333?text=Cooking+Together" alt="Cooking Together"/>
+      <div class="teambuilder-quest-dialog-box">
+          <p>
+              What a fantastic idea! With the fire crackling, your team works together to prepare a delicious meal. One person finds berries, another cleans some wild greens, and someone else uses a stick to roast a marshmallow (you brought those, right?!).
+              <br><br>
+              Everyone helps out, and soon, you're all enjoying a warm, tasty dinner. This shows how much stronger you are when you combine your efforts and share responsibilities. Good job, team! Your bellies are full, and your teamwork is even stronger!
+          </p>
+          <button class="blue-button" data-action="find-a-way">
+              Try to find your way out of the jungle
+          </button>
+      </div>
+  </div>
+
+      <div
+        id="teambuilder-step-3-bear"
+        class="teambuilder-quest-content"
+      >
+        <img
+          src="https://placehold.co/300x200/4B0082/FFFFFF?text=Bear+in+Cave"
+          alt="Bear in Cave"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>As you explore the cave, you encounter a bear! What do you do?</p>
+          <button class="red-button" data-action="scare-bear">
+            Try to scare the bear away
+          </button>
+          <button class="green-button" data-action="leave-cave">
+            Quietly back away and leave the cave
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="teambuilder-step-4-treasure"
+        class="teambuilder-quest-content"
+      >
+        <img
+          src="https://placehold.co/300x200/A0522D/FFFFFF?text=Treasure+Chest"
+          alt="Treasure Chest"
+        />
+        <div class="teambuilder-quest-dialog-box">
+          <p>
+            You and your team quietly left the cave, running in the opposite direction.
+          </p>
+          <p>
+            All of you were running until you trip over a chest...A chest that has TREASURE inside! What are
+            you going to do?
+          </p>
+          <button class="red-button" data-action="take-all">
+            Take it all for yourself
+          </button>
+          <button class="green-button" data-action="split-treasure">
+            Split it with your team
+          </button>
+        </div>
+      </div>
+
+      <div id="teambuilder-game-over-1" class="game-over-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>GAME OVER 🌳</h2>
+        <p>
+          I'll pretend I know how to start a campfire!' (acted confidently
+          without asking for help).
+        </p>
+        <p>
+          You didn't mean to, but pretending to know something dangerous can
+          hurt everyone.
+        </p>
+        <p>
+          Real campers always ask for help with fires. Grown-ups and
+          firefighters keep us safe—never hide if you're unsure!
+        </p>
+        <button id="game-over-1-return-home" class="red-button">Return Home</button>
+      </div>
+      </div>
+
+      <div id="teambuilder-ending-success" class="game-over-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>Congratulations, brave adventurers!</h2>
+        <p>
+          Filled with new confidence, you and your team decide it's time to find your way out. You combine your knowledge: one person remembers which way the water flows, another spots a faint trail, and everyone encourages each other when the path gets hard.
+        </p>
+        <p>
+          You share snacks, tell jokes to keep spirits high, and help each other over fallen logs. Because you trusted each other and worked as one, you soon see the trees thinning and the sun shining brightly through! You've made it!
+        </p>
+        <button id="teambuilder-ending-success-return-home" class="green-button">Return Home</button>
+      </div>
+      </div>
+
+      <div id="teambuilder-game-over-2" class="game-over-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>GAME OVER 🐻</h2>
+        <p>You and your team decided to try to scare away the bear...</p>
+        <p>and you were all eaten by the bear!</p>
+        <button id="game-over-2-return-home" class="red-button">Return Home</button>
+        </div>
+      </div>
+
+      <div id="teambuilder-game-over-3" class="game-over-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>GAME OVER</h2>
+        <p>
+          You took all the treasure for yourself. Your team left you by yourself
+          in the forest...
+        </p>
+        <p>
+          Maybe taking that treasure wasn't a good idea!
+        </p>
+        <button id="game-over-3-return-home" class="red-button">Return Home</button>
+        </div>
+      </div>
+
+      <div id="teambuilder-you-win" class="you-win-screen">
+        <div class="teambuilder-quest-dialog-box">
+        <h2>YOU WIN 🏆</h2>
+        <p>Your team gathers around, eyes wide with wonder.
+        </p>
+        <p>
+          'Let's split it equally' - You say.
+        </p>
+        <p>
+          As you divide the treasure, you realize the real prize was the bonds
+          you forged along the way. Each team member takes their share, already
+          planning how it will change their lives back home.
+        </p>
+        <button id="you-win-return-home" class="green-button">Return Home</button>
+      </div>
+    </div>
+
+    <div id="bottom-toolbar" class="bottom-toolbar">
+      <div class="toolbar-item active" id="toolbar-home">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125h9.75a1.125 1.125 0 0 0 1.125-1.125V9.75M8.25 21h8.25"
+          />
+        </svg>
+        <span>Home</span>
+      </div>
+      <div class="toolbar-item" id="toolbar-profile">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+          />
+        </svg>
+        <span>Profile</span>
+      </div>
+    </div>
+
+    <script>
+      const startPage = document.getElementById("start-page");
+      const loginPage = document.getElementById("login-page");
+      const gradePage = document.getElementById("grade-page");
+      const avatarPage = document.getElementById("avatar-page");
+      const homePage = document.getElementById("home-page");
+      const profilePage = document.getElementById("profile-page");
+      const mazeCustomizationPage = document.getElementById(
+        "maze-customization-page"
+      );
+      const mazeGamePage = document.getElementById("maze-game-page");
+      const mazeCongratulationsPage = document.getElementById(
+        "maze-congratulations-page"
+      );
+
+      const bubblePopGamePage = document.getElementById("bubble-pop-game-page");
+
+      const creatureCreatorPage = document.getElementById(
+        "creature-creator-page"
+      );
+      const saveSceneButton = document.getElementById("save-scene-button");
+      const creatureCreatorBackHomeButton = document.getElementById(
+        "creature-creator-back-home-button"
+      );
+
+      saveSceneButton.addEventListener("click", () => {
+        console.log("Creature scene saved!");
+        creatureCreatorBackHomeButton.classList.remove("hidden");
+      });
+
+      creatureCreatorBackHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        creatureCreatorBackHomeButton.classList.add("hidden");
+      });
+
+      const kindnessDetectivePage = document.getElementById(
+        "kindness-detective-page"
+      );
+      const teambuilderQuestPage = document.getElementById(
+        "teambuilder-quest-page"
+      );
+
+      const usernameInput = document.getElementById("username-input");
+      const getStartedButton = document.getElementById("get-started-button");
+      const alreadyAccountButton = document.getElementById(
+        "already-account-button"
+      );
+      const loginUsernameInput = document.getElementById(
+        "login-username-input"
+      );
+      const goToHomepageLoginButton = document.getElementById(
+        "go-to-homepage-login-button"
+      );
+
+      const gradeButtons = document.querySelectorAll(".grade-button");
+      const staffCodeModal = document.getElementById("staff-code-modal");
+      const staffCodeInput = document.getElementById("staff-code-input");
+      const submitStaffCodeButton =
+        document.getElementById("submit-staff-code");
+      const codeErrorMessage = document.getElementById("code-error-message");
+
+      const pixelGrid = document.getElementById("pixel-grid");
+      const colorPalette = document.getElementById("color-palette");
+      const clearGridButton = document.getElementById("clear-grid-button");
+      const saveAvatarButton = document.getElementById("save-avatar-button");
+
+      const homeContent = document.getElementById("home-content");
+      const profileAvatarDisplay = document.getElementById(
+        "profile-avatar-display"
+      );
+      const profileUsername = document.getElementById("profile-username");
+
+      const bottomToolbar = document.getElementById("bottom-toolbar");
+      const toolbarHome = document.getElementById("toolbar-home");
+      const toolbarProfile = document.getElementById("toolbar-profile");
+
+      const characterSelection = document.getElementById("character-selection");
+      const mazeColorSelection = document.getElementById(
+        "maze-color-selection"
+      );
+      const startMazeGameButton = document.getElementById(
+        "start-maze-game-button"
+      );
+      const mazeGrid = document.getElementById("maze-grid");
+      const mazePlayer = document.getElementById("maze-player");
+      const currentMazeLevelDisplay =
+        document.getElementById("current-maze-level");
+      const starsDisplay = document.getElementById("stars-display");
+      const arrowUp = document.getElementById("arrow-up");
+      const arrowDown = document.getElementById("arrow-down");
+      const arrowLeft = document.getElementById("arrow-left");
+      const arrowRight = document.getElementById("arrow-right");
+
+      const questionModal = document.getElementById("question-modal");
+      const questionText = document.getElementById("question-text");
+      const answerInput = document.getElementById("answer-input");
+      const mcOptionsContainer = document.getElementById(
+        "mc-options-container"
+      );
+      const questionFeedback = document.getElementById("question-feedback");
+      const submitAnswerButton = document.getElementById(
+        "submit-answer-button"
+      );
+
+      const playAgainButton = document.getElementById("play-again-button");
+      const backToHomeButton = document.getElementById("back-to-home-button");
+
+      const bubbleScoreDisplay = document.getElementById("bubble-score");
+      const bubbleTimerDisplay = document.getElementById("bubble-timer");
+      const bubbleArea = document.getElementById("bubble-area");
+      const bubbleResultModal = document.getElementById("bubble-result-modal");
+      const bubbleResultMessage = document.getElementById(
+        "bubble-result-message"
+      );
+      const finalBubbleScoreDisplay =
+        document.getElementById("final-bubble-score");
+      const bubblePlayAgainButton = document.getElementById(
+        "bubble-play-again-button"
+      );
+      const bubbleBackToHomeButton = document.getElementById(
+        "bubble-back-to-home-button"
+      );
+
+      function hideBubbleResultModal() {
+        bubbleResultModal.style.display = "none";
+      }
+
+      function showBubbleResultModal(message, score) {
+        bubbleResultMessage.textContent = message;
+        finalBubbleScoreDisplay.textContent = score;
+        bubbleResultModal.style.display = "flex";
+      }
+
+      bubbleBackToHomeButton.addEventListener("click", () => {
+        hideBubbleResultModal();
+        showPage("home-page");
+      });
+
+      bubblePlayAgainButton.addEventListener("click", () => {
+        hideBubbleResultModal();
+      });
+
+      const addEmojiButton = document.getElementById("add-emoji-button");
+      const textInput = document.getElementById("text-input");
+      const addTextButton = document.getElementById("add-text-button");
+      const emojiPalette = document.getElementById("emoji-palette");
+      const creationArea = document.getElementById("creation-area");
+      const backgroundOptions = document.querySelector(".background-options");
+
+      const kindnessListContainer = document.getElementById("kindness-list");
+      const kindnessCongratulations = document.getElementById(
+        "kindness-congratulations"
+      );
+      const kindnessBackToHomeButton = document.getElementById(
+        "kindness-back-to-home"
+      );
+      const kindnessCongratulationsHomeButton = document.getElementById(
+        "kindness-congratulations-home"
+      );
+      
+      const teambuilderStep1 = document.getElementById("teambuilder-step-1");
+      const teambuilderStep2 = document.getElementById("teambuilder-step-2");
+      const teambuilderStep2Share = document.getElementById("teambuilder-step-2-share");
+      const teambuilderEndingSuccess = document.getElementById("teambuilder-ending-success");
+      const teambuilderStep2Story = document.getElementById("teambuilder-step-2-story");
+      const teambuilderStep2Finale = document.getElementById("teambuilder-step-2-finale");
+      const teambuilderStep2Fire = document.getElementById(
+        "teambuilder-step-2-fire"
+      );
+      const teambuilderGameOver1 = document.getElementById("teambuilder-game-over-1");
+      const teambuilderGameOverLazy = document.getElementById("teambuilder-game-over-lazy");
+      const teambuilderStep3Bear = document.getElementById("teambuilder-step-3-bear");
+      const teambuilderStep4Treasure = document.getElementById(
+        "teambuilder-step-4-treasure"
+      );
+      const teambuilderStep3FireSuccess = document.getElementById("teambuilder-step-3-fire-success");
+      const teambuilderStep4Food = document.getElementById("teambuilder-step-4-cook-food");
+      const teambuilderGameOver2 = document.getElementById(
+        "teambuilder-game-over-2"
+      );
+      const teambuilderGameOver3 = document.getElementById(
+        "teambuilder-game-over-3"
+      );
+      const teambuilderYouWin = document.getElementById("teambuilder-you-win");
+
+      const teambuilderBackToHomeButton = document.getElementById(
+        "teambuilder-back-to-home"
+      );
+      const gameOver1ReturnHome = document.getElementById(
+        "game-over-1-return-home"
+      );
+      const gameOver2ReturnHome = document.getElementById(
+        "game-over-2-return-home"
+      );
+      const gameOver3ReturnHome = document.getElementById(
+        "game-over-3-return-home"
+      );
+      const youWinReturnHome = document.getElementById("you-win-return-home");
+
+      let selectedColor = "#000000";
+      const correctStaffCode = "BRAVE123";
+      let currentUser = {
+        username: "",
+        grade: "",
+        avatarPixels: [],
+      };
+
+      // Maze Game State
+      let mazeConfig = {
+        playerEmoji: "😀",
+        wallColor: "#4CAF50",
+        pathColor: "#E8F5E9",
+      };
+      let currentMazeLevel = 1;
+      let mazeMap = [];
+      let playerPosition = { row: 0, col: 0 };
+      let stars = [];
+      let questions = [];
+      let collectedStarsCount = 0;
+      let answeredQuestionsCount = 0;
+      let currentQuestionIndex = 0;
+      let exitPosition = { row: 0, col: 0 };
+      let mazeSize = 10; // 10x10 maze
+
+      const leadershipQuestions = [
+        // Level 1 questions (1 star, 1 question) - Open-ended
+        [
+          {
+            q: "What is one quality of a good leader?",
+            a: "any",
+            type: "open",
+          },
+        ],
+        // Level 2 questions (2 stars, 2 questions) - Multiple Choice
+        [
+          {
+            q: "How can a leader inspire others?",
+            a: "By setting a good example",
+            type: "mc",
+            options: [
+              "By setting a good example",
+              "By telling them what to do",
+              "By ignoring them",
+              "By being bossy",
+            ],
+          },
+          {
+            q: "Why is listening important for a leader?",
+            a: "To understand their team's needs",
+            type: "mc",
+            options: [
+              "To understand their team's needs",
+              "To talk more",
+              "To interrupt others",
+              "To show they are busy",
+            ],
+          },
+        ],
+        // Level 3 questions (3 stars, 3 questions) - Multiple Choice
+        [
+          {
+            q: "What does it mean to be responsible?",
+            a: "Being accountable for your actions",
+            type: "mc",
+            options: [
+              "Being accountable for your actions",
+              "Blaming others",
+              "Ignoring problems",
+              "Making excuses",
+            ],
+          },
+          {
+            q: "How can a team work together effectively?",
+            a: "By collaborating and sharing ideas",
+            type: "mc",
+            options: [
+              "By working alone",
+              "By competing against each other",
+              "By collaborating and sharing ideas",
+              "By keeping secrets",
+            ],
+          },
+          {
+            q: "Which of these is a quality of a kind leader?",
+            a: "Empathy",
+            type: "mc",
+            options: ["Empathy", "Rudeness", "Selfishness", "Arrogance"],
+          },
+        ],
+      ];
+
+      // Bubble Pop Game State
+      let bubbleScore = 0;
+      let bubbleTime = 60;
+      let bubbleTimerInterval;
+      const positivePhrases = [
+        "I am loved!",
+        "I am important!",
+        "I am enough!",
+        "I am strong!",
+        "I am proud of myself!",
+        "I believe in myself!",
+        "I am capable!",
+        "I am kind!",
+      ];
+      const negativePhrases = [
+        "I'm not good enough!",
+        "I always fail!",
+        "I am useless!",
+        "I am weak!",
+        "I give up!",
+        "I am a loser!",
+        "I can't do it!",
+        "I am afraid!",
+      ];
+      const positiveColors = [
+        "#4CAF50",
+        "#3b82f6",
+        "#eab308",
+        "#a855f7",
+        "#f97316",
+      ];
+
+      // Creature Creator State
+      let activeDraggable = null;
+      let offsetX, offsetY;
+
+      // Kindness Detective State
+      const kindnessTasks = [
+        { id: 1, text: "Help a family member with a chore.", completed: false },
+        {
+          id: 2,
+          text: "Give a genuine compliment to someone.",
+          completed: false,
+        },
+        {
+          id: 3,
+          text: "Share your toys or snacks with a friend.",
+          completed: false,
+        },
+        {
+          id: 4,
+          text: "Draw a picture for someone to cheer them up.",
+          completed: false,
+        },
+        {
+          id: 5,
+          text: "Say 'please' and 'thank you' today.",
+          completed: false,
+        },
+        {
+          id: 6,
+          text: "Offer to help a teacher or classmate.",
+          completed: false,
+        },
+        {
+          id: 7,
+          text: "Pick up litter you see in your neighborhood.",
+          completed: false,
+        },
+        {
+          id: 8,
+          text: "Listen patiently when someone is talking.",
+          completed: false,
+        },
+      ];
+      let currentKindnessTasks = JSON.parse(JSON.stringify(kindnessTasks));
+
+      function showPage(pageToShow) {
+        const allPages = [
+          startPage,
+          loginPage,
+          gradePage,
+          avatarPage,
+          homePage,
+          profilePage,
+          mazeCustomizationPage,
+          mazeGamePage,
+          mazeCongratulationsPage,
+          bubblePopGamePage,
+          creatureCreatorPage,
+          kindnessDetectivePage,
+          teambuilderQuestPage,
+        ];
+        allPages.forEach((page) => page.classList.remove("active"));
+        pageToShow.classList.add("active");
+
+        if (pageToShow === homePage || pageToShow === profilePage) {
+          bottomToolbar.classList.remove("hidden");
+        } else {
+          bottomToolbar.classList.add("hidden");
+        }
+      }
+
+      getStartedButton.addEventListener("click", () => {
+        const username = usernameInput.value.trim();
+        if (username) {
+          currentUser.username = username;
+          showPage(gradePage);
+        } else {
+          alert("Please enter your name or username to get started.");
+        }
+      });
+
+      alreadyAccountButton.addEventListener("click", () => {
+        showPage(loginPage);
+      });
+
+      goToHomepageLoginButton.addEventListener("click", () => {
+        const username = loginUsernameInput.value.trim();
+        if (username) {
+          currentUser.username = username;
+          currentUser.grade = "upper-elementary";
+          showPage(homePage);
+          renderHomePage(currentUser.grade);
+          toolbarHome.classList.add("active");
+          toolbarProfile.classList.remove("active");
+        } else {
+          alert("Please enter your name or username.");
+        }
+      });
+
+      gradeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const grade = button.dataset.grade;
+          currentUser.grade = grade;
+          if (grade === "staff") {
+            openModal();
+          } else {
+            showPage(avatarPage);
+            initializePixelGrid();
+          }
+        });
+      });
+
+      function openModal() {
+        staffCodeModal.style.display = "flex";
+        codeErrorMessage.classList.add("hidden");
+        staffCodeInput.value = "";
+      }
+
+      function closeModal() {
+        staffCodeModal.style.display = "none";
+      }
+
+      submitStaffCodeButton.addEventListener("click", () => {
+        if (staffCodeInput.value === correctStaffCode) {
+          closeModal();
+          showPage(homePage);
+          renderHomePage(currentUser.grade);
+          toolbarHome.classList.add("active");
+          toolbarProfile.classList.remove("active");
+        } else {
+          codeErrorMessage.classList.remove("hidden");
+        }
+      });
+
+      window.onclick = function (event) {
+        if (event.target === staffCodeModal) {
+          closeModal();
+        }
+      };
+
+      function initializePixelGrid() {
+        pixelGrid.innerHTML = "";
+        for (let i = 0; i < 100; i++) {
+          const pixel = document.createElement("div");
+          pixel.classList.add("pixel");
+          pixel.addEventListener("click", () => {
+            pixel.style.backgroundColor = selectedColor;
+          });
+          pixelGrid.appendChild(pixel);
+        }
+      }
+
+      colorPalette.addEventListener("click", (event) => {
+        const clickedColorBox = event.target.closest(".color-box");
+        if (clickedColorBox) {
+          document.querySelectorAll(".color-box").forEach((box) => {
+            box.classList.remove("selected");
+          });
+          clickedColorBox.classList.add("selected");
+          selectedColor = clickedColorBox.dataset.color;
+        }
+      });
+
+      clearGridButton.addEventListener("click", () => {
+        document.querySelectorAll(".pixel").forEach((pixel) => {
+          pixel.style.backgroundColor = "#ffffff";
+        });
+      });
+
+      saveAvatarButton.addEventListener("click", () => {
+        const pixels = document.querySelectorAll("#pixel-grid .pixel");
+        currentUser.avatarPixels = Array.from(pixels).map(
+          (pixel) => pixel.style.backgroundColor || "#ffffff"
+        );
+        alert("Avatar saved!");
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      function renderHomePage(grade) {
+        homeContent.innerHTML = "";
+        let quests = [];
+        let miniGames = [];
+        let instructionalText = "";
+
+        if (grade === "elementary") {
+          quests = [
+            {
+              name: "Kindness Detective",
+              image: "KindnessDetectiveLogo.png",
+              id: "kindness-detective-trigger",
+            },
+            {
+              name: "Teamwork Adventure",
+              image: "teambuilderLogo.png",
+              id: "teambuilder-quest-trigger",
+            },
+          ];
+          miniGames = [
+            {
+              name: "Fun Maze",
+              image: "mazeIcon.png",
+              id: "maze-game-trigger",
+            },
+          ];
+        } else if (grade === "upper-elementary") {
+          quests = [
+            {
+              name: "Teambuilder Quest",
+              image: "teambuilderLogo.png",
+              id: "teambuilder-quest-trigger",
+            },
+            {
+              name: "Creature Creator",
+              image: "CreatureCreatorLogo.png",
+              id: "creature-creator-trigger",
+            },
+            {
+              name: "Kindness Detective",
+              image: "KindnessDetectiveLogo.png",
+              id: "kindness-detective-trigger",
+            },
+          ];
+          miniGames = [
+            {
+              name: "Bubble Pop Game",
+              image: "BubblePopGameLogo.png",
+              id: "bubble-pop-game-trigger",
+            },
+            {
+              name: "Maze Game",
+              image: "mazeIcon.png",
+              id: "maze-game-trigger",
+            },
+          ];
+        } else if (grade === "staff") {
+          quests = [
+            {
+              name: "Teambuilder Quest (Staff Guide)",
+              image: "teambuilderLogo.png",
+              id: "teambuilder-quest-trigger",
+            },
+          ];
+          miniGames = [
+            {
+              name: "Maze Game (Staff Guide)",
+              image: "mazeIcon.png",
+              id: "maze-game-trigger",
+            },
+          ];
+          instructionalText = `
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-lg shadow-md">
+                        <p class="font-bold text-lg mb-2">Welcome, Staff & Volunteers!</p>
+                        <p class="text-base">This section provides access to quests and mini-games. For students, these activities help develop essential skills like teamwork, problem-solving, and kindness.</p>
+                        <p class="text-base mt-2"><strong>Teambuilder Quest:</strong> This interactive story guides students through scenarios requiring cooperation and decision-making. Observe how students engage and discuss their choices to reinforce positive behaviors.</p>
+                        <p class="text-base mt-2"><strong>Maze Game:</strong> This game challenges students with navigation and critical thinking. Each level includes questions designed to assess understanding of leadership qualities. Encourage students to articulate their reasoning.</p>
+                        <p class="text-base mt-2">Use these tools to facilitate discussions and reinforce learning objectives. Feel free to explore and understand the student experience!</p>
+                    </div>
+                `;
+        }
+
+        if (instructionalText) {
+          homeContent.innerHTML += instructionalText;
+        }
+
+        if (quests.length > 0) {
+          const questsSection = document.createElement("div");
+          questsSection.innerHTML = `
+                    <div class="section-header">
+                        <img src="questLogo.png" alt="Quests Icon">
+                        <h2>Quests</h2>
+                    </div>
+                    <div class="quests-grid"></div>`;
+          const questsGrid = questsSection.querySelector(".quests-grid");
+          quests.forEach((quest) => {
+            const card = document.createElement("div");
+            card.classList.add("quest-card");
+            card.innerHTML = `<img src="${quest.image}" alt="${quest.name}"><h3>${quest.name}</h3>`;
+            if (quest.id) {
+              card.id = quest.id;
+            }
+            questsGrid.appendChild(card);
+          });
+          homeContent.appendChild(questsSection);
+
+          const kindnessDetectiveTrigger = document.getElementById(
+            "kindness-detective-trigger"
+          );
+          if (kindnessDetectiveTrigger) {
+            kindnessDetectiveTrigger.addEventListener("click", () => {
+              showPage(kindnessDetectivePage);
+              renderKindnessDetectivePage();
+            });
+          }
+
+          const teambuilderQuestTrigger = document.getElementById(
+            "teambuilder-quest-trigger"
+          );
+          if (teambuilderQuestTrigger) {
+            teambuilderQuestTrigger.addEventListener("click", () => {
+              showPage(teambuilderQuestPage);
+              showTeambuilderQuestStep(teambuilderStep1);
+            });
+          }
+        }
+
+        if (miniGames.length > 0) {
+          const minigamesSection = document.createElement("div");
+          minigamesSection.innerHTML = `
+                    <div class="section-header">
+                        <img src="miniGameLogo.png" alt="Mini-Games Icon">
+                        <h2>Mini-Games</h2>
+                    </div>
+                    <div class="minigames-grid"></div>`;
+          const minigamesGrid =
+            minigamesSection.querySelector(".minigames-grid");
+          miniGames.forEach((game) => {
+            const card = document.createElement("div");
+            card.classList.add("minigame-card");
+            card.innerHTML = `<img src="${game.image}" alt="${game.name}"><h3>${game.name}</h3>`;
+            if (game.id) {
+              card.id = game.id;
+            }
+            minigamesGrid.appendChild(card);
+          });
+          homeContent.appendChild(minigamesSection);
+
+          const mazeGameTrigger = document.getElementById("maze-game-trigger");
+          if (mazeGameTrigger) {
+            mazeGameTrigger.addEventListener("click", () => {
+              showPage(mazeCustomizationPage);
+              initializeMazeCustomization();
+            });
+          }
+
+          const bubblePopGameTrigger = document.getElementById(
+            "bubble-pop-game-trigger"
+          );
+          if (bubblePopGameTrigger) {
+            bubblePopGameTrigger.addEventListener("click", () => {
+              showPage(bubblePopGamePage);
+              startGamePopBubble();
+            });
+          }
+
+          const creatureCreatorTrigger = document.getElementById(
+            "creature-creator-trigger"
+          );
+          if (creatureCreatorTrigger) {
+            creatureCreatorTrigger.addEventListener("click", () => {
+              showPage(creatureCreatorPage);
+              initializeCreatureCreator();
+            });
+          }
+        }
+      }
+
+      function renderProfilePage() {
+        profileUsername.textContent = currentUser.username;
+        profileAvatarDisplay.innerHTML = "";
+        if (
+          currentUser.avatarPixels &&
+          currentUser.avatarPixels.length === 100
+        ) {
+          currentUser.avatarPixels.forEach((color) => {
+            const pixel = document.createElement("div");
+            pixel.classList.add("profile-pixel");
+            pixel.style.backgroundColor = color;
+            profileAvatarDisplay.appendChild(pixel);
+          });
+        } else {
+          for (let i = 0; i < 100; i++) {
+            const pixel = document.createElement("div");
+            pixel.classList.add("profile-pixel");
+            pixel.style.backgroundColor = "#cccccc";
+            profileAvatarDisplay.appendChild(pixel);
+          }
+        }
+      }
+
+      toolbarHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      toolbarProfile.addEventListener("click", () => {
+        showPage(profilePage);
+        renderProfilePage();
+        toolbarProfile.classList.add("active");
+        toolbarHome.classList.remove("active");
+      });
+
+      function initializeMazeCustomization() {
+        document
+          .querySelectorAll(".character-emoji")
+          .forEach((el) => el.classList.remove("border-blue-500"));
+        document
+          .querySelectorAll(".maze-color-option")
+          .forEach((el) => el.classList.remove("border-blue-500"));
+
+        characterSelection
+          .querySelector(`[data-emoji="${mazeConfig.playerEmoji}"]`)
+          .classList.add("border-blue-500");
+        mazeColorSelection
+          .querySelector(`[data-wall-color="${mazeConfig.wallColor}"]`)
+          .classList.add("border-blue-500");
+      }
+
+      characterSelection.addEventListener("click", (event) => {
+        const selectedEmoji = event.target.closest(".character-emoji");
+        if (selectedEmoji) {
+          document
+            .querySelectorAll(".character-emoji")
+            .forEach((el) => el.classList.remove("border-blue-500"));
+          selectedEmoji.classList.add("border-blue-500");
+          mazeConfig.playerEmoji = selectedEmoji.dataset.emoji;
+        }
+      });
+
+      mazeColorSelection.addEventListener("click", (event) => {
+        const selectedColorOption = event.target.closest(".maze-color-option");
+        if (selectedColorOption) {
+          document
+            .querySelectorAll(".maze-color-option")
+            .forEach((el) => el.classList.remove("border-blue-500"));
+          selectedColorOption.classList.add("border-blue-500");
+          mazeConfig.wallColor = selectedColorOption.dataset.wallColor;
+          mazeConfig.pathColor = selectedColorOption.dataset.pathColor;
+        }
+      });
+
+      startMazeGameButton.addEventListener("click", () => {
+        currentMazeLevel = 1;
+        collectedStarsCount = 0;
+        answeredQuestionsCount = 0;
+        currentQuestionIndex = 0;
+        showPage(mazeGamePage);
+        generateMaze(currentMazeLevel);
+      });
+
+      function generateMaze(level) {
+        mazeGrid.innerHTML = "";
+        mazeGrid.style.gridTemplateColumns = `repeat(${mazeSize}, 1fr)`;
+        mazeGrid.style.gridTemplateRows = `repeat(${mazeSize}, 1fr)`;
+        mazeGrid.style.width = `${mazeSize * 40}px`;
+        mazeGrid.style.height = `${mazeSize * 40}px`;
+
+        const mazeLayouts = {
+          1: [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 1, 1],
+            [1, 0, 1, 1, 1, 0, 1, 0, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+          ],
+          2: [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 1, 0, 0, 1],
+            [1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+            [1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
+            [1, 0, 1, 0, 1, 1, 1, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+          ],
+          3: [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+            [
+              1, 0, 1, 0, 0, 0, 0, 1, 0, 1,
+            ] 
+            [1, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+          ],
+        };
+
+        mazeMap = mazeLayouts[level];
+        stars = [];
+        questions = leadershipQuestions[level - 1];
+        collectedStarsCount = 0;
+        answeredQuestionsCount = 0;
+        currentQuestionIndex = 0;
+
+        const levelElements = {
+          1: {
+            start: { row: 1, col: 1 },
+            stars: [{ row: 8, col: 2 }],
+            exit: { row: 8, col: 8 },
+          },
+          2: {
+            start: { row: 1, col: 1 },
+            stars: [
+              { row: 7, col: 1 },
+              { row: 3, col: 7 },
+            ],
+            exit: { row: 8, col: 8 },
+          },
+          3: {
+            start: { row: 1, col: 1 },
+            stars: [
+              { row: 1, col: 8 },
+              { row: 8, col: 1 },
+              { row: 4, col: 4 },
+            ],
+            exit: { row: 8, col: 8 },
+          },
+        };
+
+        playerPosition = { ...levelElements[level].start };
+        stars = [...levelElements[level].stars];
+        exitPosition = { ...levelElements[level].exit };
+
+        currentMazeLevelDisplay.textContent = level;
+        updateStarsDisplay();
+
+        for (let r = 0; r < mazeSize; r++) {
+          for (let c = 0; c < mazeSize; c++) {
+            const cell = document.createElement("div");
+            cell.classList.add("maze-cell");
+            if (mazeMap[r][c] === 1) {
+              cell.style.backgroundColor = mazeConfig.wallColor;
+            } else {
+              cell.style.backgroundColor = mazeConfig.pathColor;
+            }
+            mazeGrid.appendChild(cell);
+          }
+        }
+
+        stars.forEach((s) => {
+          const starCellIndex = s.row * mazeSize + s.col;
+          mazeGrid.children[starCellIndex].textContent = "⭐";
+        });
+        const exitCellIndex = exitPosition.row * mazeSize + exitPosition.col;
+        mazeGrid.children[exitCellIndex].textContent = "🚪";
+
+        updatePlayerPosition();
+      }
+
+      function updatePlayerPosition() {
+        mazePlayer.textContent = mazeConfig.playerEmoji;
+        mazePlayer.style.left = `${playerPosition.col * 40}px`;
+        mazePlayer.style.top = `${playerPosition.row * 40}px`;
+      }
+
+      function updateStarsDisplay() {
+        starsDisplay.innerHTML = "";
+        for (let i = 0; i < stars.length; i++) {
+          starsDisplay.innerHTML += i < collectedStarsCount ? "⭐" : "☆";
+        }
+      }
+
+      function checkCollision(nextRow, nextCol) {
+        if (
+          nextRow < 0 ||
+          nextRow >= mazeSize ||
+          nextCol < 0 ||
+          nextCol >= mazeSize
+        ) {
+          return true;
+        }
+        return mazeMap[nextRow][nextCol] === 1;
+      }
+
+      function movePlayer(direction) {
+        let newRow = playerPosition.row;
+        let newCol = playerPosition.col;
+
+        if (direction === "up") newRow--;
+        else if (direction === "down") newRow++;
+        else if (direction === "left") newCol--;
+        else if (direction === "right") newCol++;
+
+        if (!checkCollision(newRow, newCol)) {
+          playerPosition.row = newRow;
+          playerPosition.col = newCol;
+          updatePlayerPosition();
+          checkGameStatus();
+        }
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (
+          mazeGamePage.classList.contains("active") &&
+          questionModal.style.display === "none"
+        ) {
+          if (event.key === "ArrowUp") movePlayer("up");
+          else if (event.key === "ArrowDown") movePlayer("down");
+          else if (event.key === "ArrowLeft") movePlayer("left");
+          else if (event.key === "ArrowRight") movePlayer("right");
+        }
+      });
+
+      arrowUp.addEventListener("click", () => movePlayer("up"));
+      arrowDown.addEventListener("click", () => movePlayer("down"));
+      arrowLeft.addEventListener("click", () => movePlayer("left"));
+      arrowRight.addEventListener("click", () => movePlayer("right"));
+
+      function checkGameStatus() {
+        stars.forEach((star, index) => {
+          if (
+            playerPosition.row === star.row &&
+            playerPosition.col === star.col
+          ) {
+            const starCell = mazeGrid.children[star.row * mazeSize + star.col];
+            if (starCell.textContent === "⭐") {
+              collectedStarsCount++;
+              starCell.textContent = "";
+              updateStarsDisplay();
+              if (
+                collectedStarsCount === stars.length &&
+                answeredQuestionsCount < questions.length
+              ) {
+                showQuestion();
+              }
+            }
+          }
+        });
+
+        if (
+          playerPosition.row === exitPosition.row &&
+          playerPosition.col === exitPosition.col
+        ) {
+          if (
+            collectedStarsCount === stars.length &&
+            answeredQuestionsCount === questions.length
+          ) {
+            if (currentMazeLevel < 3) {
+              currentMazeLevel++;
+              generateMaze(currentMazeLevel);
+            } else {
+              showPage(mazeCongratulationsPage);
+            }
+          } else {
+            alert("Collect all stars and answer all questions before exiting!");
+          }
+        }
+      }
+
+      function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.q;
+        answerInput.value = "";
+        questionFeedback.classList.add("hidden");
+
+        if (currentQuestion.type === "open") {
+          answerInput.classList.remove("hidden");
+          mcOptionsContainer.classList.add("hidden");
+          submitAnswerButton.textContent = "Submit Answer";
+        } else if (currentQuestion.type === "mc") {
+          answerInput.classList.add("hidden");
+          mcOptionsContainer.classList.remove("hidden");
+          submitAnswerButton.textContent = "Submit Answer";
+          mcOptionsContainer.innerHTML = "";
+          currentQuestion.options.forEach((option) => {
+            const optionButton = document.createElement("button");
+            optionButton.classList.add("option-button");
+            optionButton.textContent = option;
+            optionButton.addEventListener("click", () => {
+              answerInput.value = option;
+              submitAnswerButton.click();
+            });
+            mcOptionsContainer.appendChild(optionButton);
+          });
+        }
+        questionModal.style.display = "flex";
+      }
+
+      submitAnswerButton.addEventListener("click", () => {
+        const currentQuestion = questions[currentQuestionIndex];
+        const userAnswer = answerInput.value.trim().toLowerCase();
+
+        if (currentQuestion.type === "open") {
+          if (isProfane(userAnswer)) {
+            questionFeedback.textContent =
+              "That language is not appropriate. Please try again.";
+            questionFeedback.classList.remove("hidden");
+          } else {
+            answeredQuestionsCount++;
+            currentQuestionIndex++;
+            questionModal.style.display = "none";
+            checkPostQuestionStatus();
+          }
+        } else if (currentQuestion.type === "mc") {
+          const correctAnswer = currentQuestion.a.toLowerCase();
+          if (userAnswer === correctAnswer) {
+            answeredQuestionsCount++;
+            currentQuestionIndex++;
+            questionModal.style.display = "none";
+            checkPostQuestionStatus();
+          } else {
+            questionFeedback.textContent =
+              "Incorrect answer. Please try again.";
+            questionFeedback.classList.remove("hidden");
+          }
+        }
+      });
+
+      function checkPostQuestionStatus() {
+        if (
+          collectedStarsCount === stars.length &&
+          answeredQuestionsCount === questions.length
+        ) {
+          // All stars collected and questions answered for this level
+        } else if (
+          collectedStarsCount === stars.length &&
+          answeredQuestionsCount < questions.length
+        ) {
+          showQuestion();
+        }
+      }
+
+      function isProfane(text) {
+        const profanityList = [
+          "fuck",
+          "shit",
+          "bitch",
+          "asshole",
+          "cunt",
+          "damn",
+          "hell",
+        ];
+        return profanityList.some((word) => text.includes(word));
+      }
+
+      playAgainButton.addEventListener("click", () => {
+        currentMazeLevel = 1;
+        collectedStarsCount = 0;
+        answeredQuestionsCount = 0;
+        currentQuestionIndex = 0;
+        showPage(mazeGamePage);
+        generateMaze(currentMazeLevel);
+      });
+
+      backToHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      // Bubble Pop Game Logic
+      function startGamePopBubble() {
+        bubbleScore = 0;
+        bubbleTime = 60;
+        bubbleScoreDisplay.textContent = `Score: ${bubbleScore}`;
+        bubbleTimerDisplay.textContent = `Time: ${bubbleTime}`;
+        bubbleArea.innerHTML = "";
+        bubbleResultModal.style.display = "none";
+
+        clearInterval(bubbleTimerInterval);
+        bubbleTimerInterval = setInterval(updateBubbleTimer, 1000);
+        spawnBubbles();
+      }
+
+      function updateBubbleTimer() {
+        bubbleTime--;
+        bubbleTimerDisplay.textContent = `Time: ${bubbleTime}`;
+        if (bubbleTime <= 0) {
+          clearInterval(bubbleTimerInterval);
+          endBubbleGame();
+        }
+      }
+
+      function spawnBubbles() {
+        bubbleArea.innerHTML = "";
+        for (let i = 0; i < 10; i++) {
+          createBubble();
+        }
+        setInterval(createBubble, 1500);
+      }
+
+      function createBubble() {
+        const bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+
+        const isPositive = Math.random() > 0.3;
+        let phrase;
+        if (isPositive) {
+          phrase =
+            positivePhrases[Math.floor(Math.random() * positivePhrases.length)];
+          bubble.classList.add("positive");
+          const randomColor =
+            positiveColors[Math.floor(Math.random() * positiveColors.length)];
+          bubble.style.backgroundColor = randomColor;
+        } else {
+          phrase =
+            negativePhrases[Math.floor(Math.random() * negativePhrases.length)];
+          bubble.classList.add("negative");
+          bubble.style.backgroundColor = "#EF4444";
+        }
+
+        bubble.textContent = phrase;
+
+        const startX = Math.random() * (bubbleArea.offsetWidth - 80);
+        bubble.style.left = `${startX}px`;
+        bubble.style.top = `${bubbleArea.offsetHeight}px`;
+
+        bubble.addEventListener("click", () => {
+          if (isPositive) {
+            bubbleScore += 10;
+          } else {
+            bubbleScore -= 5;
+          }
+          bubbleScoreDisplay.textContent = `Score: ${bubbleScore}`;
+          bubble.remove();
+        });
+
+        bubbleArea.appendChild(bubble);
+
+        bubble.animate(
+          [
+            { transform: `translateY(0px)`, opacity: 1 },
+            {
+              transform: `translateY(-${bubbleArea.offsetHeight + 100}px)`,
+              opacity: 0,
+            },
+          ],
+          {
+            duration: 10000 + Math.random() * 5000,
+            fill: "forwards",
+          }
+        ).onfinish = () => bubble.remove();
+      }
+
+      function endBubbleGame() {
+        bubbleArea.innerHTML = "";
+        finalBubbleScoreDisplay.textContent = bubbleScore;
+        if (bubbleScore >= 70) {
+          bubbleResultMessage.textContent =
+            "Fantastic job! You've got amazing skills and abilities!";
+        } else {
+          bubbleResultMessage.textContent =
+            "Great effort! Keep practicing, you'll get there!";
+        }
+        bubbleResultModal.style.display = "flex";
+      }
+
+      bubblePlayAgainButton.addEventListener("click", startGamePopBubble);
+      bubbleBackToHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      function initializeCreatureCreator() {
+        creationArea.innerHTML = "";
+        creationArea.style.background = "#f0f2f5";
+        document
+          .querySelectorAll(".background-option")
+          .forEach((el) => el.classList.remove("selected"));
+      }
+
+      addEmojiButton.addEventListener("click", () => {
+        emojiPalette.classList.toggle("hidden");
+      });
+
+      emojiPalette.addEventListener("dragstart", (e) => {
+        if (e.target.classList.contains("emoji-item")) {
+          e.dataTransfer.setData("text/plain", e.target.textContent);
+          activeDraggable = e.target.textContent;
+        }
+      });
+
+      creationArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+
+      creationArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (activeDraggable) {
+          const emoji = document.createElement("span");
+          emoji.classList.add("draggable-emoji");
+          emoji.textContent = activeDraggable;
+          emoji.style.left = `${
+            e.clientX - creationArea.getBoundingClientRect().left - 25
+          }px`;
+          emoji.style.top = `${
+            e.clientY - creationArea.getBoundingClientRect().top - 25
+          }px`;
+          makeDraggable(emoji);
+          creationArea.appendChild(emoji);
+          activeDraggable = null;
+          emojiPalette.classList.add("hidden");
+        }
+      });
+
+      addTextButton.addEventListener("click", () => {
+        let text = textInput.value.trim();
+        if (text) {
+          text = filterProfanity(text);
+          const textElement = document.createElement("span");
+          textElement.classList.add("draggable-text");
+          textElement.textContent = text;
+          textElement.style.left = "50%";
+          textElement.style.top = "50%";
+          textElement.style.transform = "translate(-50%, -50%)";
+          makeDraggable(textElement);
+          creationArea.appendChild(textElement);
+          textInput.value = "";
+        }
+      });
+
+      function filterProfanity(text) {
+        const profanityList = ["fuck", "shit", "bitch", "asshole", "cunt"];
+        let filteredText = text;
+        profanityList.forEach((word) => {
+          const regex = new RegExp(word, "gi");
+          filteredText = filteredText.replace(regex, "***");
+        });
+        return filteredText;
+      }
+
+      function makeDraggable(element) {
+        let isDragging = false;
+
+        element.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          offsetX = e.clientX - element.getBoundingClientRect().left;
+          offsetY = e.clientY - element.getBoundingClientRect().top;
+          element.style.cursor = "grabbing";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          let newX =
+            e.clientX - creationArea.getBoundingClientRect().left - offsetX;
+          let newY =
+            e.clientY - creationArea.getBoundingClientRect().top - offsetY;
+
+          newX = Math.max(
+            0,
+            Math.min(newX, creationArea.offsetWidth - element.offsetWidth)
+          );
+          newY = Math.max(
+            0,
+            Math.min(newY, creationArea.offsetHeight - element.offsetHeight)
+          );
+
+          element.style.left = `${newX}px`;
+          element.style.top = `${newY}px`;
+        });
+
+        document.addEventListener("mouseup", () => {
+          isDragging = false;
+          element.style.cursor = "grab";
+        });
+      }
+
+      backgroundOptions.addEventListener("click", (event) => {
+        const selectedBgOption = event.target.closest(".background-option");
+        if (selectedBgOption) {
+          document
+            .querySelectorAll(".background-option")
+            .forEach((el) => el.classList.remove("selected"));
+          selectedBgOption.classList.add("selected");
+          creationArea.style.background = selectedBgOption.dataset.bgColor;
+        }
+      });
+
+      saveSceneButton.addEventListener("click", () => {
+        alert(
+          "Scene saved! (Screenshot functionality can be added using libraries like html2canvas)"
+        );
+      });
+
+
+      function renderKindnessDetectivePage() {
+        kindnessListContainer.innerHTML = "";
+        kindnessCongratulations.classList.add("hidden");
+
+        kindnessTasks.forEach((task) => {
+          const taskItem = document.createElement("div");
+          taskItem.classList.add("kindness-item");
+          taskItem.dataset.id = task.id;
+          const existingTask = currentKindnessTasks.find(
+            (t) => t.id === task.id
+          );
+          if (existingTask && existingTask.completed) {
+            taskItem.classList.add("completed");
+          }
+
+          const taskText = document.createElement("span");
+          taskText.classList.add("kindness-item-text");
+          taskText.textContent = task.text;
+
+          const checkbox = document.createElement("div");
+          checkbox.classList.add("kindness-checkbox");
+          if (existingTask && existingTask.completed) {
+            checkbox.classList.add("checked");
+            checkbox.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9.75 10.5a.75.75 0 0 1-1.12.02L3.248 11.25a.75.75 0 1 1 1.04-1.12l4.273 3.96 9.135-9.927a.75.75 0 0 1 1.04-.208Z" clip-rule="evenodd" /></svg>`;
+          }
+
+          checkbox.addEventListener("click", () => {
+            toggleKindnessTask(task.id);
+          });
+
+          taskItem.appendChild(taskText);
+          taskItem.appendChild(checkbox);
+          kindnessListContainer.appendChild(taskItem);
+        });
+        checkAllKindnessTasksCompleted(); 
+      }
+
+      function toggleKindnessTask(id) {
+        const taskIndex = currentKindnessTasks.findIndex(
+          (task) => task.id === id
+        );
+        if (taskIndex > -1) {
+          currentKindnessTasks[taskIndex].completed =
+            !currentKindnessTasks[taskIndex].completed;
+          renderKindnessDetectivePage(); 
+        }
+      }
+
+      function checkAllKindnessTasksCompleted() {
+        const allCompleted = currentKindnessTasks.every(
+          (task) => task.completed
+        );
+        if (allCompleted) {
+          kindnessCongratulations.classList.remove("hidden");
+        } else {
+          kindnessCongratulations.classList.add("hidden");
+        }
+      }
+
+      kindnessBackToHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      kindnessCongratulationsHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      function showTeambuilderQuestStep(stepElement) {
+        const allTeambuilderSteps = [
+          teambuilderStep1,
+          teambuilderStep2,
+          teambuilderStep2Share,
+          teambuilderStep2Story,
+          teambuilderStep2Finale,
+          teambuilderStep2Fire,
+          teambuilderEndingSuccess,
+          teambuilderStep3FireSuccess,
+          teambuilderStep4Food,
+          teambuilderGameOver1,
+          teambuilderGameOverLazy,
+          teambuilderStep3Bear,
+          teambuilderStep4Treasure,
+          teambuilderGameOver2,
+          teambuilderGameOver3,
+          teambuilderYouWin,
+        ];
+        allTeambuilderSteps.forEach((step) => {
+        if (step) { 
+            step.classList.add("hidden");
+            if (step.classList.contains('game-over-screen') || step.classList.contains('you-win-screen')) {
+                step.classList.remove("active");
+            }
+        }
+    });
+
+    if (stepElement) {
+        stepElement.classList.remove("hidden");
+        if (stepElement.classList.contains('game-over-screen') || stepElement.classList.contains('you-win-screen')) {
+            stepElement.classList.add("active");
+        }
+    }
+      }
+
+      teambuilderQuestPage.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target.dataset.action === "collect-wood") {
+          showTeambuilderQuestStep(teambuilderStep2Fire);
+        } else if (target.dataset.action === "dont-say-anything") {
+          showTeambuilderQuestStep(teambuilderGameOver1);
+        } else if (target.dataset.action === "find-water") {
+          showTeambuilderQuestStep(teambuilderStep2);
+        } else if (target.dataset.action === "share-water") {
+          showTeambuilderQuestStep(teambuilderStep2Share);
+        } else if (target.dataset.action === "find-a-way") {
+          showTeambuilderQuestStep(teambuilderEndingSuccess);
+        } else if (target.dataset.action === "explore-cave") {
+          showTeambuilderQuestStep(teambuilderStep3Bear);
+        } else if (target.dataset.action === "tell-a-story") {
+          showTeambuilderQuestStep(teambuilderStep2Story);
+        } else if (target.dataset.action === "continue-adventure") {
+          showTeambuilderQuestStep(teambuilderStep2Finale);
+        } else if (target.dataset.action === "let-others-work") {
+          showTeambuilderQuestStep(teambuilderGameOverLazy); 
+        } else if (target.dataset.action === "ask-team") {
+          showTeambuilderQuestStep(teambuilderStep3FireSuccess); 
+        } else if (target.dataset.action === "cook-food") {
+          showTeambuilderQuestStep(teambuilderStep4Food); 
+        } else if (target.dataset.action === "scare-bear") {
+          showTeambuilderQuestStep(teambuilderGameOver2);
+        } else if (target.dataset.action === "leave-cave") {
+          showTeambuilderQuestStep(
+            teambuilderStep4Treasure
+          ); 
+        } else if (target.dataset.action === "take-all") {
+          showTeambuilderQuestStep(teambuilderGameOver3);
+        } else if (target.dataset.action === "split-treasure") {
+          showTeambuilderQuestStep(teambuilderYouWin);
+        }
+      });
+
+      gameOver1ReturnHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+      });
+      gameOver2ReturnHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+      });
+      gameOver3ReturnHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+      });
+      youWinReturnHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+      });
+
+      teambuilderBackToHomeButton.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        toolbarHome.classList.add("active");
+        toolbarProfile.classList.remove("active");
+      });
+
+      if (gameOver1ReturnHome) { 
+    gameOver1ReturnHome.addEventListener("click", () => {
+        showPage(homePage);
+        renderHomePage(currentUser.grade);
+        if (toolbarHome) toolbarHome.classList.add("active");
+        if (toolbarProfile) toolbarProfile.classList.remove("active"); 
+    });
+  }
+
+      if (teambuilderEndingSuccess) { 
+        teambuilderEndingSuccess.addEventListener("click", () => {
+            showPage(homePage);
+            renderHomePage(currentUser.grade);
+            if (toolbarHome) toolbarHome.classList.add("active");
+            if (toolbarProfile) toolbarProfile.classList.remove("active"); 
+        });
+      }
+
+      if (teambuilderGameOverLazy) { 
+        teambuilderGameOverLazy.addEventListener("click", () => {
+            showPage(homePage);
+            renderHomePage(currentUser.grade);
+            if (toolbarHome) toolbarHome.classList.add("active");
+            if (toolbarProfile) toolbarProfile.classList.remove("active"); 
+        });
+      }
+
+      showPage(startPage);
+    </script>
+  </body>
+</html>
