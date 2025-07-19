@@ -1519,10 +1519,6 @@
         <span class="emoji-item" draggable="true">💖</span>
       </div>
       <div id="creation-area" class="creation-area"></div>
-      <div id="trashcan" class="trashcan">
-        <span class="text-3xl">🗑️</span>
-        <span>Drag here to delete</span>
-      </div>
     </div>
 
     <!-- Kindness Detective Page -->
@@ -2056,7 +2052,6 @@
       const emojiPalette = document.getElementById("emoji-palette");
       const creationArea = document.getElementById("creation-area");
       const backgroundOptions = document.querySelector(".background-options");
-      const trashcan = document.getElementById("trashcan");
 
       const kindnessListContainer = document.getElementById("kindness-list");
       const kindnessCongratulations = document.getElementById(
@@ -3109,37 +3104,6 @@
           activeDraggable = e.target.textContent;
         }
       });
-      
-      /* trashcan feature where it will delete the emojis and text if put in the trashcan */
-      function dragEnd() {
-          draggedItem = null;
-        }
-
-      /* enlarge feature where it will make the emojis larger */
-      function enlargeItem() {
-          let currentFontSize = parseFloat(getComputedStyle(this).fontSize);
-          this.style.fontSize = `${currentFontSize * 1.2}px`; 
-        }
-
-      trashcan.addEventListener("dragover", (e) => {
-          e.preventDefault(); 
-          trashcan.classList.add("highlight");
-          e.dataTransfer.dropEffect = "move"; 
-        });
-
-        trashcan.addEventListener("dragleave", () => {
-          trashcan.classList.remove("highlight");
-        });
-
-        trashcan.addEventListener("drop", (e) => {
-          e.preventDefault();
-          trashcan.classList.remove("highlight");
-          if (draggedItem) {
-            draggedItem.remove(); 
-            selectedItem = null; 
-            draggedItem = null; 
-          }
-        });
 
       creationArea.addEventListener("dragover", (e) => {
         e.preventDefault();
