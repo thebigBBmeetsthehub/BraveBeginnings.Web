@@ -3120,7 +3120,38 @@
         }
       });
 
-      item.addEventListener("dblclick", enlargeItem);
+      function makeDraggable(element) {
+        let isDragging = false;
+        let offsetX, offsetY; // Declare these variables
+    
+        element.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - element.getBoundingClientRect().left;
+            offsetY = e.clientY - element.getBoundingClientRect().top;
+            element.style.cursor = "grabbing";
+        });
+    
+        document.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+            let newX = e.clientX - creationArea.getBoundingClientRect().left - offsetX;
+            let newY = e.clientY - creationArea.getBoundingClientRect().top - offsetY;
+    
+            // Ensure element stays within creationArea bounds
+            newX = Math.max(0, Math.min(newX, creationArea.offsetWidth - element.offsetWidth));
+            newY = Math.max(0, Math.min(newY, creationArea.offsetHeight - element.offsetHeight));
+    
+            element.style.left = `${newX}px`;
+            element.style.top = `${newY}px`;
+        });
+    
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            element.style.cursor = "grab";
+        });
+    
+        // Add the dblclick listener here, for the 'element' that is being made draggable
+        element.addEventListener("dblclick", enlargeItem); // Assuming enlargeItem is defined
+    }
       
       addTextButton.addEventListener("click", () => {
         let text = textInput.value.trim();
