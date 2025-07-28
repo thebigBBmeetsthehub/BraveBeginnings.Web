@@ -2975,39 +2975,54 @@
       }
 
       function showQuestion() {
-        const currentQuestion = questions[currentQuestionIndex];
-        questionText.textContent = currentQuestion.q;
-        answerInput.value = "";
-        questionFeedback.classList.add("hidden");
-      
-        mcOptionsContainer.innerHTML = "";
-        mcOptionsContainer.classList.add("hidden"); 
-      
-        if (currentQuestion.type === "open") {
-          answerInput.classList.remove("hidden");
-          submitAnswerButton.textContent = "Submit Answer";
-        } else if (currentQuestion.type === "mc") {
-          answerInput.classList.add("hidden");
-          mcOptionsContainer.classList.remove("hidden"); 
-          submitAnswerButton.textContent = "Submit Answer";
-          
-          currentQuestion.options.forEach((option) => {
-            const optionButton = document.createElement("button");
-            optionButton.classList.add("option-button");
-            optionButton.classList.add("bg-gray-200", "hover:bg-gray-300", "text-gray-800", "font-semibold", "py-2", "px-4", "rounded-lg", "shadow-sm", "transition", "duration-150", "ease-in-out", "transform", "hover:scale-105", "w-full", "text-left", "text-base");
-            optionButton.textContent = option;
-            optionButton.addEventListener("click", () => {
-              answerInput.value = option; 
-              submitAnswerButton.click(); 
-            });
-            mcOptionsContainer.appendChild(optionButton);
-          });
-        }
+  const currentQuestion = questions[currentQuestionIndex];
+  questionText.textContent = currentQuestion.q;
+  answerInput.value = "";
+  questionFeedback.classList.add("hidden");
 
-        if (typeof questionModal !== 'undefined') {
-          questionModal.style.display = "flex";
-        }
+  console.log("--- showQuestion called ---");
+  console.log("Current Question Type:", currentQuestion.type);
+  console.log("mcOptionsContainer element:", mcOptionsContainer);
+
+  if (mcOptionsContainer) { 
+    mcOptionsContainer.innerHTML = ""; 
+    mcOptionsContainer.classList.add("hidden"); 
+    console.log("mcOptionsContainer hidden class added. Current classes:", mcOptionsContainer.classList);
+  } else {
+    console.error("Error: mcOptionsContainer element not found!");
+  }
+  if (currentQuestion.type === "open") {
+    answerInput.classList.remove("hidden");
+    submitAnswerButton.textContent = "Submit Answer";
+    console.log("Question is OPEN. Answer input shown.");
+  } else if (currentQuestion.type === "mc") {
+    answerInput.classList.add("hidden");
+    if (mcOptionsContainer) { 
+      mcOptionsContainer.classList.remove("hidden"); 
+      console.log("Question is MC. MC options container shown.");
+    }
+    submitAnswerButton.textContent = "Submit Answer";
+    
+    currentQuestion.options.forEach((option) => {
+      const optionButton = document.createElement("button");
+      optionButton.classList.add("option-button");
+      optionButton.classList.add("bg-gray-200", "hover:bg-gray-300", "text-gray-800", "font-semibold", "py-2", "px-4", "rounded-lg", "shadow-sm", "transition", "duration-150", "ease-in-out", "transform", "hover:scale-105", "w-full", "text-left", "text-base");
+      optionButton.textContent = option;
+      optionButton.addEventListener("click", () => {
+        answerInput.value = option; 
+        submitAnswerButton.click(); 
+      });
+      if (mcOptionsContainer) { 
+        mcOptionsContainer.appendChild(optionButton);
       }
+    });
+  }
+  if (typeof questionModal !== 'undefined') {
+    questionModal.style.display = "flex";
+  } else {
+    console.error("Error: questionModal element not found!");
+  }
+}
 
       submitAnswerButton.addEventListener("click", () => {
         const currentQuestion = questions[currentQuestionIndex];
