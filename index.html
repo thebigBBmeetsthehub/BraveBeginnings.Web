@@ -2980,26 +2980,30 @@
         answerInput.value = "";
         questionFeedback.classList.add("hidden");
       
+        mcOptionsContainer.innerHTML = "";
+        mcOptionsContainer.classList.add("hidden"); 
+      
         if (currentQuestion.type === "open") {
           answerInput.classList.remove("hidden");
-          mcOptionsContainer.classList.add("hidden");
           submitAnswerButton.textContent = "Submit Answer";
         } else if (currentQuestion.type === "mc") {
           answerInput.classList.add("hidden");
-          mcOptionsContainer.classList.remove("hidden");
+          mcOptionsContainer.classList.remove("hidden"); 
           submitAnswerButton.textContent = "Submit Answer";
-          mcOptionsContainer.innerHTML = "";
+          
           currentQuestion.options.forEach((option) => {
             const optionButton = document.createElement("button");
             optionButton.classList.add("option-button");
+            optionButton.classList.add("bg-gray-200", "hover:bg-gray-300", "text-gray-800", "font-semibold", "py-2", "px-4", "rounded-lg", "shadow-sm", "transition", "duration-150", "ease-in-out", "transform", "hover:scale-105", "w-full", "text-left", "text-base");
             optionButton.textContent = option;
             optionButton.addEventListener("click", () => {
-              answerInput.value = option;
-              submitAnswerButton.click();
+              answerInput.value = option; 
+              submitAnswerButton.click(); 
             });
             mcOptionsContainer.appendChild(optionButton);
           });
         }
+
         if (typeof questionModal !== 'undefined') {
           questionModal.style.display = "flex";
         }
