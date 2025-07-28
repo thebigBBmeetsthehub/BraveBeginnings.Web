@@ -2979,7 +2979,7 @@
         questionText.textContent = currentQuestion.q;
         answerInput.value = "";
         questionFeedback.classList.add("hidden");
-
+      
         if (currentQuestion.type === "open") {
           answerInput.classList.remove("hidden");
           mcOptionsContainer.classList.add("hidden");
@@ -3000,7 +3000,7 @@
             mcOptionsContainer.appendChild(optionButton);
           });
         }
-         if (typeof questionModal !== 'undefined') {
+        if (typeof questionModal !== 'undefined') {
           questionModal.style.display = "flex";
         }
       }
