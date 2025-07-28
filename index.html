@@ -2786,7 +2786,7 @@
             [1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
             [1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
             [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1], 
+            [1, 0, 1, 1, 1, 1, 0, 1, 0, 1], 
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
           ],
         };
@@ -3000,7 +3000,9 @@
             mcOptionsContainer.appendChild(optionButton);
           });
         }
-        questionModal.style.display = "flex";
+         if (typeof questionModal !== 'undefined') {
+          questionModal.style.display = "flex";
+        }
       }
 
       submitAnswerButton.addEventListener("click", () => {
