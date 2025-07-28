@@ -2125,7 +2125,7 @@
       let answeredQuestionsCount = 0;
       let currentQuestionIndex = 0;
       let exitPosition = { row: 0, col: 0 };
-      let mazeSize = 10; // 10x10 maze
+      let mazeSize = mazeMap[0].length; 
 
       const leadershipQuestions = [
         // Level 1 questions (1 star, 1 question) - Open-ended
@@ -2190,6 +2190,57 @@
             a: "Empathy",
             type: "mc",
             options: ["Empathy", "Rudeness", "Selfishness", "Arrogance"],
+          },
+        ],
+        // Level 4 questions (4 stars, 4 questions) - Open-ended placeholders
+        [
+          {
+            q: "Describe a time you showed leadership.",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "How can you help a friend who is feeling sad?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "What is a good way to solve a disagreement?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "Why is it important to be fair to everyone?",
+            a: "any",
+            type: "open",
+          },
+        ],
+        // Level 5 questions (5 stars, 5 questions) - Open-ended placeholders
+        [
+          {
+            q: "What does it mean to be a good role model?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "How can you encourage others to do their best?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "What is one challenge a leader might face, and how can they overcome it?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "Why is teamwork important in school or at home?",
+            a: "any",
+            type: "open",
+          },
+          {
+            q: "If you were a leader, what is one positive change you would make?",
+            a: "any",
+            type: "open",
           },
         ],
       ];
@@ -2717,7 +2768,7 @@
           4: [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 1, 0, 0, 0, 0, 1], 
-            [1, 1, 1, 0, 1, 0, 1, 1, 0, 1], //star 1 + star 2
+            [1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
             [1, 0, 0, 0, 1, 0, 1, 0, 0, 1],
             [1, 0, 1, 1, 1, 0, 1, 0, 1, 1],
             [1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
@@ -2913,7 +2964,7 @@
             collectedStarsCount === stars.length &&
             answeredQuestionsCount === questions.length
           ) {
-            if (currentMazeLevel < 5) {
+            if (currentMazeLevel < Object.keys(mazeLayouts).length) { //if this doesnt work. change this back to 5 instead of "Object.keys(mazeLayouts).length"
               currentMazeLevel++;
               generateMaze(currentMazeLevel);
             } else {
@@ -2989,7 +3040,6 @@
           collectedStarsCount === stars.length &&
           answeredQuestionsCount === questions.length
         ) {
-          // All stars collected and questions answered for this level
         } else if (
           collectedStarsCount === stars.length &&
           answeredQuestionsCount < questions.length
