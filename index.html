@@ -2964,7 +2964,7 @@
             collectedStarsCount === stars.length &&
             answeredQuestionsCount === questions.length
           ) {
-            if (currentMazeLevel < Object.keys(mazeLayouts).length) { //if this doesnt work. change this back to 5 instead of "Object.keys(mazeLayouts).length"
+            if (currentMazeLevel < 5) { 
               currentMazeLevel++;
               generateMaze(currentMazeLevel);
             } else {
